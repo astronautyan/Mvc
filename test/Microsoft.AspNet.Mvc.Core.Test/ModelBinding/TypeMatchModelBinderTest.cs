@@ -21,13 +21,15 @@ namespace Microsoft.AspNet.Mvc.ModelBinding.Test
             };
 
             var binder = new TypeMatchModelBinder();
+            var modelState = bindingContext.ModelState;
 
             // Act
             var result = await binder.BindModelAsync(bindingContext);
 
             // Assert
             Assert.Null(result);
-            Assert.Empty(bindingContext.ModelState);
+            Assert.Empty(modelState.Keys);
+            Assert.True(modelState.IsValid);
         }
 
         [Fact]
@@ -41,6 +43,7 @@ namespace Microsoft.AspNet.Mvc.ModelBinding.Test
             };
 
             var binder = new TypeMatchModelBinder();
+            var modelState = bindingContext.ModelState;
 
             // Act
             var result = await binder.BindModelAsync(bindingContext);
@@ -49,7 +52,11 @@ namespace Microsoft.AspNet.Mvc.ModelBinding.Test
             Assert.NotNull(result);
             Assert.True(result.IsModelSet);
             Assert.Equal(42, result.Model);
-            Assert.True(bindingContext.ModelState.ContainsKey("theModelName"));
+            var key = Assert.Single(modelState.Keys);
+            Assert.True(modelState.IsValid);
+            Assert.Equal("theModelName", key);
+            Assert.Equal("42", modelState[key].Value.AttemptedValue);
+            Assert.Equal("42", modelState[key].Value.RawValue);
         }
 
         [Fact]

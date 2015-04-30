@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc.ModelBinding;
@@ -121,7 +118,6 @@ namespace Microsoft.AspNet.Mvc.IntegrationTests
             Assert.Equal(ModelValidationState.Valid, modelState[key].ValidationState);
         }
 
-        // [Fact(Skip = "CancellationToken should not be validated #2447.")]
         [Fact]
         public async Task BindParameter_WithData_GetsBound()
         {
@@ -166,6 +162,39 @@ namespace Microsoft.AspNet.Mvc.IntegrationTests
             Assert.Equal("someValue", modelState[key].Value.RawValue);
             Assert.Empty(modelState[key].Errors);
             Assert.Equal(ModelValidationState.Valid, modelState[key].ValidationState);
+        }
+
+        [Fact]
+        public async Task BindParameter_NoData_DoesNotGetBound()
+        {
+            // Arrange
+            var argumentBinder = ModelBindingTestHelper.GetArgumentBinder();
+            var parameter = new ParameterDescriptor()
+            {
+                Name = "Parameter1",
+                BindingInfo = new BindingInfo(),
+
+                ParameterType = typeof(string)
+            };
+
+            // No Data.
+            var operationContext = ModelBindingTestHelper.GetOperationBindingContext(request =>
+            {
+            });
+
+            var modelState = new ModelStateDictionary();
+
+            // Act
+            var modelBindingResult = await argumentBinder.BindModelAsync(parameter, modelState, operationContext);
+
+            // Assert
+
+            // ModelBindingResult
+            Assert.Null(modelBindingResult);
+
+            // ModelState
+            Assert.True(modelState.IsValid);
+            Assert.Empty(modelState.Keys);
         }
     }
 }

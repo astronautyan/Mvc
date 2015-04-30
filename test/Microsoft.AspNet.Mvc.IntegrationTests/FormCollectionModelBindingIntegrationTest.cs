@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Microsoft.AspNet.Mvc.IntegrationTests
 {
-    public class FormCollectionMoldeBindingIntegrationTest
+    public class FormCollectionModelBindingIntegrationTest
     {
         private class Person
         {
